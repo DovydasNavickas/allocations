@@ -33,8 +33,8 @@ namespace Allocations
                 {
                     await Task.Delay(TimeSpan.FromTicks(10));
                 };
-
-                var tests = Enumerable.Range(0, 1000000).Select(x => new Test { Id = Guid.NewGuid().ToString() }).ToList();
+                const int numberOfTestObjects = 1000000;
+                var tests = Enumerable.Range(0, numberOfTestObjects).Select(x => new Test { Id = Guid.NewGuid().ToString() }).ToList();
 
                 foreach (var test in tests)
                 {
@@ -58,7 +58,7 @@ namespace Allocations
 
                 var s3 = new Stopwatch();
                 s3.Start();
-                var tasks = new List<Task>();
+                var tasks = new List<Task>(numberOfTestObjects);
                 foreach (var test in tests)
                 {
                     tasks.Add(action(test));
@@ -69,8 +69,8 @@ namespace Allocations
                 var nl = Environment.NewLine;
                 var statistics = new Dictionary<string, Stopwatch>()
                 {
-                    ["No allocations. Loop through objects with constant time async action"] = s1,
-                    ["Allocate list via Linq. Select tasks of constant time async action and await WhenAll"] = s2,
+                    ["No allocations. Loop through objects with constant time async function"] = s1,
+                    ["Allocate list via Linq. Select tasks of constant time async function and await WhenAll"] = s2,
                     ["Allocate list manually. Add tasks to list manually and await WhenAll"] = s3
                 }
                 .Select(x => $"{x.Key}{nl}{x.Value.ElapsedTicks} ticks ({x.Value.ElapsedMilliseconds} ms)")
